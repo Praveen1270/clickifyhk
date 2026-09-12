@@ -1,0 +1,56 @@
+{
+  "name": "clickify",
+  "version": "0.1.1",
+  "description": "Real-time voice AI assistant that lives on your screen",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "build": "tsc && node -e \"const fs=require('fs'); ['src/renderer/index.html','src/renderer/hint.html','src/renderer/settings.html'].forEach(f=>{ fs.mkdirSync('dist/renderer',{recursive:true}); fs.copyFileSync(f, f.replace('src/','dist/')); }); if(fs.existsSync('assets/icon.png')){ fs.mkdirSync('dist/assets',{recursive:true}); fs.copyFileSync('assets/icon.png','dist/assets/icon.png'); }\"",
+    "start": "npm run build && electron .",
+    "package": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --x64 --publish never",
+    "package:dir": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --x64 --dir --publish never"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.10",
+    "cross-env": "^10.1.0",
+    "electron": "^33.4.0",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.3"
+  },
+  "build": {
+    "appId": "com.clickify.app",
+    "productName": "Clickify",
+    "copyright": "Copyright © 2026 Clickify",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "assets/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Clickify",
+      "uninstallDisplayName": "Clickify"
+    }
+  }
+}
