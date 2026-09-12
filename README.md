@@ -1,132 +1,136 @@
-# Clickify
+# Clickify 🎯
 
-Clickify is a small Windows app that sits on your screen and follows your mouse. You speak, it looks at your screen, and it talks back with step-by-step answers.
+> Real-time voice AI assistant that lives on your Windows screen and follows your mouse. Speak, ask questions about what's currently on your display, and receive spoken step-by-step guidance.
 
----
-
-## Install (Windows)
-
-1. Open the **[latest release](https://github.com/Praveen1270/clickify/releases/latest)** and download **`Clickify Setup … .exe`**.
-2. Run the installer and finish the steps.
-3. Start Clickify from the Start menu or your desktop shortcut.
-
-**First time:** If something is missing, the app opens **API keys**. You can also open it from the **tray icon → API keys…**. Keys are stored only on your PC in `%APPDATA%\Clickify\clickify.env`.
-
-| Key        | Needed for                                |
-|------------|-------------------------------------------|
-| Cartesia   | Listening and speaking (always)           |
-| OpenRouter | Default vision model (Gemini 2.5 Flash)   |
-| Gemini     | If you pick direct Gemini as vision model |
-
-**No `.exe` on the release page yet?** Someone with the repo can [publish a release](#publish-a-release) or you can build it yourself: `npm install`, then `npm run package` — the installer ends up in the `release/` folder.
+[![GitHub Release](https://img.shields.io/github/v/release/Praveen1270/clickifyhk?include_prereleases&style=flat-square)](https://github.com/Praveen1270/clickifyhk/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%20x64-blue.svg?style=flat-square)](https://github.com/Praveen1270/clickifyhk)
 
 ---
 
-## How to use
+## ✨ Features
 
-| Shortcut              | What it does                          |
-|-----------------------|---------------------------------------|
-| **Ctrl+Shift+Space** | Hold to talk; release when you’re done |
-| **Tray icon**        | Show overlay, API keys, startup, quit |
-
-Say things like “stop” or “cancel” to interrupt playback (Telugu and Hindi phrases work too).
-
-**Tip:** Ask about what you actually see on the screen; the app sends a screenshot to the AI.
-
----
-
-## What happens under the hood (short version)
-
-1. Your mic is used only when you’re speaking (quiet parts are skipped).
-2. The app takes a quick screenshot of your main screen (the overlay hides for a moment).
-3. Your speech is turned into text (Cartesia).
-4. The text and image go to OpenRouter (Gemini 2.5 Flash) or Gemini, which returns spoken steps.
-5. Clickify reads those steps aloud (Cartesia).
-
-A little recent chat history is sent each time so follow-up questions make sense.
+- **Screen-Aware Vision**: Captures your screen and analyzes the active window or region to answer contextual questions about what you're doing.
+- **Natural Voice Interaction**: High-quality speech-to-text and low-latency voice responses powered by **Cartesia** (`ink-whisper` and `sonic-3.6`).
+- **Advanced Multimodal Intelligence**: Vision reasoning with **OpenRouter** (`google/gemini-2.5-flash`) or direct **Google Gemini** (`gemini-2.0-flash`).
+- **Interactive Cursor Companion**: Lightweight transparent overlay that follows your mouse cursor or docks unobtrusively.
+- **Audio & Hardware Control**: Built-in microphone selector and live volume meter in settings to test and optimize your audio input.
+- **Multilingual Support**: Supports Indian and global languages including English (`en-IN`), Hindi (`hi-IN`), and Telugu (`te-IN`).
+- **Secure Key Storage**: API keys are stored locally on your device in `%APPDATA%\Clickify\clickify.env` — never sent to third-party servers.
 
 ---
 
-## Remove audio from a video (`clip.mp4`)
+## 🚀 Getting Started
 
+### 1. Download & Install (Windows)
 
-If you have a file named **`clip.mp4`** (or any `.mp4`) and want **video only, no sound**, use **FFmpeg** (free, common tool).
+1. Head to the **[Latest Release](https://github.com/Praveen1270/clickifyhk/releases/latest)**.
+2. Download and run **`Clickify Setup … .exe`**.
+3. Launch **Clickify** from your Start menu or Desktop shortcut.
 
-1. Install FFmpeg if you don’t have it: [ffmpeg.org/download.html](https://ffmpeg.org/download.html) (or `winget install ffmpeg` on Windows).
-2. Open a terminal in the folder that contains your video.
-3. Run:
+### 2. Configure API Keys
+
+On first launch, Clickify will prompt you to configure your API keys. You can also right-click the **System Tray icon → Settings / API keys…** at any time.
+
+| Service | Provider | Purpose |
+| :--- | :--- | :--- |
+| **Cartesia** | [cartesia.ai](https://cartesia.ai) | Voice synthesis (TTS) & speech recognition (STT) |
+| **OpenRouter** *(Default)* | [openrouter.ai](https://openrouter.ai) | Vision & multimodal reasoning (`gemini-2.5-flash`) |
+| **Google Gemini** *(Alternative)* | [aistudio.google.com](https://aistudio.google.com) | Direct Google Gemini 2.0 Flash vision |
+
+---
+
+## 🎮 How to Use
+
+| Action | Shortcut / Trigger | Description |
+| :--- | :--- | :--- |
+| **Push-to-Talk** | `Ctrl + Shift + Space` | Hold to speak; release when you're done |
+| **Voice Activity** | Continuous Mic Detection | Automatically begins listening when you speak |
+| **Interrupt Playback** | Say *"Stop"* or *"Cancel"* | Instantly stops speech response (works in English, Hindi, and Telugu) |
+| **System Tray** | Right-click tray icon | Access Settings, toggle overlay, configure auto-start, or exit |
+
+> **Pro Tip:** Ask direct questions about what you see on your monitor (e.g., *"How do I export this layer?"*, *"Why is this code failing?"*, or *"Summarize this document"*). Clickify takes an instant snapshot of your display when you ask.
+
+---
+
+## 🛠️ Development Setup
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v20+ recommended)
+- Windows 10/11 (x64)
+
+### Clone & Install
 
 ```bash
-ffmpeg -i clip.mp4 -c copy -an clip_no_audio.mp4
-```
-
-- **`-i clip.mp4`** — your input file (change the name if yours is different).
-- **`-an`** — removes all audio tracks.
-- **`-c copy`** — copies the video without re-encoding (fast; same quality).
-
-The new file is **`clip_no_audio.mp4`**. To overwrite the original instead, use a temporary name first, then rename—overwriting the same file FFmpeg is reading can cause errors.
-
-**If you need to re-encode** (for example copy fails), try:
-
-```bash
-ffmpeg -i clip.mp4 -c:v libx264 -an clip_no_audio.mp4
-```
-
----
-
-## For developers
-
-**You need:** Node.js, npm, and Windows (the build is set up for Windows x64).
-
-Install and run from source:
-
-```bash
+git clone https://github.com/Praveen1270/clickifyhk.git
+cd clickifyhk
 npm install
 ```
 
-Copy `.env.example` to `.env` and add your API keys. Same variables as in the table above, plus `LLM_PROVIDER` (`openrouter` or `gemini`).
+### Local Environment Configuration
+
+Copy the sample environment file:
+
+```bash
+cp .env.example .env
+```
+
+Set your keys in `.env`:
+```env
+CARTESIA_API_KEY=your-cartesia-key-here
+OPENROUTER_API_KEY=sk-or-v1-...your-key-here
+GEMINI_API_KEY=your-gemini-key-here
+LLM_PROVIDER=openrouter
+```
+
+### Run Locally
 
 ```bash
 npm start
 ```
 
-**Build the installer:**
+### Build Executable & Installer
+
+To package the standalone Windows installer into the `release/` directory:
 
 ```bash
 npm run package
 ```
 
-Output: `release/` (e.g. `Clickify Setup 0.1.1.exe`).
-
-**Project folders (overview):**
-
-- `src/main/` — Electron main process (tray, APIs, overlay wiring)
-- `src/renderer/` — Overlay UI, voice, playback
-- `assets/` — App icon
-
 ---
 
-## Publish a release
+## 📂 Project Architecture
 
-GitHub Actions builds the Windows installer (`.github/workflows/release-windows.yml`).
-
-1. Update `version` in `package.json` if needed.
-2. Create and push a tag, for example:
-
-```bash
-git tag v0.1.1
-git push origin v0.1.1
+```
+clickifyhk/
+├── .github/
+│   └── workflows/
+│       └── release-windows.yml  # Automated CI release builder
+├── assets/
+│   └── icon.png                 # Application and tray icons
+├── src/
+│   ├── main/
+│   │   └── index.ts             # Main process: tray, IPC, shortcuts, window manager
+│   ├── preload/
+│   │   └── index.ts             # Secure contextBridge API bindings
+│   └── renderer/
+│       ├── index.html           # Screen overlay companion UI
+│       ├── renderer.ts          # Cursor tracking, audio VAD, speech pipeline
+│       ├── hint.html            # Step-by-step hint bubble
+│       ├── settings.html        # Settings panel & live mic meter
+│       └── settings.ts          # Settings controller & device enumeration
+├── tsconfig.json                # TypeScript compiler configuration
+└── package.json                 # Project dependencies & build scripts
 ```
 
-3. Check **[Releases](https://github.com/Praveen1270/clickify/releases)** — the workflow attaches the setup `.exe`.
-
-You can also run **Actions → Release Windows installer → Run workflow** and download the artifact.
-
 ---
 
-## More detail (optional)
+## 🚢 Publishing a Release
 
-- **Installed app keys** live in `clickify.env` under your user data folder. While developing, that file overrides a project `.env` if both exist.
-- **Models:** OpenRouter uses `google/gemini-2.5-flash`; Gemini uses `gemini-2.0-flash`. Cartesia uses `sonic-3.6` (TTS) and `ink-whisper` (STT).
-- **Languages:** TTS uses `en-IN`, `hi-IN`, and `te-IN` presets.
-- The overlay stays visible (opacity) during screenshots so audio recording stays stable.
+GitHub Actions automatically builds the Windows installer and publishes a GitHub Release whenever you push a version tag:
+
+```bash
+git tag v0.1.2
+git push origin v0.1.2
+```
+
+You can view builds and download installers under [GitHub Releases](https://github.com/Praveen1270/clickifyhk/releases).
